@@ -1,0 +1,35 @@
+name: NodeJS with Webpack
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [22.x]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Build
+      run: |
+        npm install
+        npm run build
+         # 👇 新增：打包产物上传步骤
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: production-files       # 压缩包的名称（在 GitHub 网页上显示的下载名）
+        path: dist/                  # 需要上传的文件夹路径（根据你 Webpack 输出的实际目录修改，如 dist/ 或 build/）
+        retention-days: 7            # 可选：文件在 GitHub 上的保存天数（默认 90 天，缩短可节省你的 GitHub 免费存储额度）
